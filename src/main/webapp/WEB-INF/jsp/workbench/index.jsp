@@ -1,7 +1,8 @@
 <%
 String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";
 %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page isELIgnored="false" contentType="text/html;charset=UTF-8" language="java" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,8 +37,10 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			$(this).children("a").css("color","white");
 		});
 		
-		
-		window.open("main/index.html","workareaFrame");
+		//打开某个页面
+		//参数1，页面url
+		//参数2，目标位置id
+		window.open("workbench/main/toMainIndex.do","workareaFrame");
 		
 	});
 	
@@ -130,7 +133,15 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='login.jsp';">确定</button>
+					<%--
+						点击确定按钮，发送请求
+							退出的业务逻辑：
+								登录时，将user对象存入到session中。
+									必须要销毁
+								十天免登陆，将用户名和密码存入到cookie中。
+									必须要销毁
+					--%>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='workbench/user/logout.do';">确定</button>
 				</div>
 			</div>
 		</div>
@@ -143,7 +154,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			<ul>
 				<li class="dropdown user-dropdown">
 					<a href="javascript:void(0)" style="text-decoration: none; color: white;" class="dropdown-toggle" data-toggle="dropdown">
-						<span class="glyphicon glyphicon-user"></span> zhangsan <span class="caret"></span>
+						<%--TODO el表达式失效--%>
+						<span class="glyphicon glyphicon-user"></span>${sessionScope.user.name}<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">
 						<li><a href="settings/index.html"><span class="glyphicon glyphicon-wrench"></span> 系统设置</a></li>
@@ -163,7 +175,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		<div id="navigation" style="left: 0px; width: 18%; position: relative; height: 100%; overflow:auto;">
 		
 			<ul id="no1" class="nav nav-pills nav-stacked">
-				<li class="liClass"><a href="main/index.html" target="workareaFrame"><span class="glyphicon glyphicon-home"></span> 工作台</a></li>
+				<li class="liClass"><a href="main/index.jsp" target="workareaFrame"><span class="glyphicon glyphicon-home"></span> 工作台</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-tag"></span> 动态</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-time"></span> 审批</a></li>
 				<li class="liClass"><a href="javascript:void(0);" target="workareaFrame"><span class="glyphicon glyphicon-user"></span> 客户公海</a></li>

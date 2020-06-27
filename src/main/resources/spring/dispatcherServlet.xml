@@ -39,7 +39,11 @@
             <!--拦截的请求-->
             <mvc:mapping path="/**"/>
             <!--不拦截的请求-->
-            <mvc:exclude-mapping path="/settings/user/login.do"/>
+            <!--点击登录按钮，执行的操作-->
+            <mvc:exclude-mapping path="/workbench/user/login.do"/>
+            <mvc:exclude-mapping path="/workbench/user/ajax2login.do"/>
+            <!--跳转到登录页面的操作-->
+            <mvc:exclude-mapping path="/workbench/user/toLogin.do"/>
             <!--拦截器-->
             <bean class="com.bjpowernode.crm.interceptor.LoginInterceptor"/>
         </mvc:interceptor>

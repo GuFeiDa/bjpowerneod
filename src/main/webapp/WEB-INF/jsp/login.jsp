@@ -14,38 +14,49 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 	<script>
 		$(function () {
 
-			//点击登录按钮，发送请求
-			// $("#loginBtn").click(function () {
-			// 	// alert("loginAct : " + $("#loginAct").val() +"   loginPwd : "+$("#loginPwd").val())
-			//
-			// 	//发送ajax请求，进行登录操作。
-			// 	$.ajax({
-			// 		type: "POST",
-			// 		dataType:"json",
-			// 		url: "workbench/user/ajax2login.do",
-			// 		data: {
-			// 			"loginAct":$("#loginAct").val(),
-			// 			"loginPwd":$("#loginPwd").val()
-			// 		},
-			// 		success: function(data){
-			// 			//alert( "Data Saved: " + msg );
-			// 			//data : { "success" : true/false } //后台返回
-			// 			if(data.success){
-			// 				//登录成功
-			// 				//跳转到工作台的欢迎页面
-			// 				window.location.href = "workbench/user/toWorkbenchIndex.do";
-			// 			}else{
-			// 				//登录失败
-			// 				alert("用户名或密码错误");
-			// 			}
-			// 		}
-			// 	});
-			//
-			// })
 
+
+
+			//点击登录按钮，发送请求
 			$("#loginBtn").click(function () {
-				$("#loginForm").submit();
-			});
+				// alert("loginAct : " + $("#loginAct").val() +"   loginPwd : "+$("#loginPwd").val())
+
+				//十天免登陆操作
+				//获取十天免登陆的复选框状态
+				var flag = "";
+				if($("#flag").prop("checked")){
+					flag = "a";
+				}
+				//发送ajax请求，进行登录操作。
+				$.ajax({
+					type: "POST",
+					dataType:"json",
+					url: "workbench/user/ajax2login.do",
+					data: {
+						"loginAct":$("#loginAct").val(),
+						"loginPwd":$("#loginPwd").val(),
+						"flag":flag
+					},
+					success: function(data){
+						//alert( "Data Saved: " + msg );
+						//data : { "success" : true/false , "msg" : xxx } //后台返回
+						if(data.success){
+							//登录成功
+							//跳转到工作台的欢迎页面
+							window.location.href = "workbench/user/toWorkbenchIndex.do";
+						}else{
+							//登录失败
+							alert(data.msg);
+						}
+					}
+				});
+
+
+			})
+
+			// $("#loginBtn").click(function () {
+			// 	$("#loginForm").submit();
+			// });
 
 
 			//让登录用户名输入框获取焦点事件
@@ -110,7 +121,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					3.通过事件发送请求，submit();
 						$("#loginForm").submit();
 			--%>
-			<form id="loginForm" action="workbench/user/login.do" method="post" class="form-horizontal" role="form">
+			<form id="loginForm" class="form-horizontal" role="form">
 				<div class="form-group form-group-lg">
 					<div style="width: 350px;">
 						<%--添加input标签的name属性key，输入的内容就是value
@@ -123,7 +134,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					</div>
 					<div class="checkbox"  style="position: relative;top: 30px; left: 10px;">
 						<label>
-							<input type="checkbox"> 十天内免登录
+							<input id="flag" type="checkbox"> 十天内免登录
 						</label>
 						&nbsp;&nbsp;
 						<span id="msg"></span>

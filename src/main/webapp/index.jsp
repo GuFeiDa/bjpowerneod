@@ -11,7 +11,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 <body>
 	<script type="text/javascript">
 		<!--window.location.href=login.jsp-->
-		document.location.href = "login.jsp";
+		// document.location.href = "login.jsp";
+		document.location.href = "workbench/user/toLogin.do";
 	</script>
 </body>
 </html>

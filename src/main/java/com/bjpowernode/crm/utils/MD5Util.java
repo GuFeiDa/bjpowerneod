@@ -4,7 +4,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class MD5Util {
-	
+
+	/**
+	 * 传递明文的密码，获得MD5加密后的密码
+	 * @param password
+	 * @return
+	 */
 	public static String getMD5(String password) {
 		try {
 			// 得到一个信息摘要器

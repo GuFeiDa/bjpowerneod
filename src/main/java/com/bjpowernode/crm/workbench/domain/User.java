@@ -9,10 +9,17 @@ public class User implements Serializable {
     private String name;
     private String loginPwd;
     private String email;
-    private String expireTime;
-    private String lockState;
+
+    //为空代表，永不过期，不为空代表失效时间
+    private String expireTime;//过期时间
+
+    //为空使用，为1使用，为0锁定
+    private String lockState;//锁定状态
+
     private String deptno;
-    private String allowIps;
+
+    //为空代表IP不受限，如果不为空，需要匹配当前IP地址
+    private String allowIps;//访问IP
     private String createTime;
     private String createBy;
     private String editTime;

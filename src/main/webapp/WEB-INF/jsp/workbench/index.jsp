@@ -36,12 +36,12 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 			//当前项目颜色变成白色
 			$(this).children("a").css("color","white");
 		});
-		
+
 		//打开某个页面
 		//参数1，页面url
 		//参数2，目标位置id
 		window.open("workbench/main/toMainIndex.do","workareaFrame");
-		
+
 	});
 	
 </script>
@@ -158,7 +158,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						<span class="glyphicon glyphicon-user"></span>${sessionScope.user.name}<span class="caret"></span>
 					</a>
 					<ul class="dropdown-menu">
-						<li><a href="settings/index.html"><span class="glyphicon glyphicon-wrench"></span> 系统设置</a></li>
+						<%--跳转到系统设置首页--%>
+						<li><a href="settings/toSettingsIndex.do"><span class="glyphicon glyphicon-wrench"></span> 系统设置</a></li>
 						<li><a href="javascript:void(0)" data-toggle="modal" data-target="#myInformation"><span class="glyphicon glyphicon-file"></span> 我的资料</a></li>
 						<li><a href="javascript:void(0)" data-toggle="modal" data-target="#editPwdModal"><span class="glyphicon glyphicon-edit"></span> 修改密码</a></li>
 						<li><a href="javascript:void(0);" data-toggle="modal" data-target="#exitModal"><span class="glyphicon glyphicon-off"></span> 退出</a></li>

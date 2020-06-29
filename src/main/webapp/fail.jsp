@@ -6,18 +6,10 @@
 <head>
     <base href="<%=basePath%>">
     <title>Title</title>
+
 </head>
 <body>
-    $.ajax({
-        url: "",
-        data: {
-
-        },
-        type: "",
-        dataType:"json",
-        success: function(data){
-
-        }
-    });
+    <h5>哎呀，页面找不到啦~</h5>
+    <img src="image/fail.jpg">
 </body>
 </html>

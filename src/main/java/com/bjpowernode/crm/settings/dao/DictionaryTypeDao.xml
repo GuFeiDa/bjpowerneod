@@ -52,4 +52,17 @@
          where code = #{code}
     </update>
 
+    <!--void deleteByCodes(String[] codes);-->
+    <delete id="deleteByCodes">
+        delete from tbl_dic_type where code in
+        <foreach collection="array" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+    </delete>
+
+    <!--List<String> findAllDicCode();-->
+    <select id="findAllDicCode" resultType="java.lang.String">
+        select code from tbl_dic_type
+    </select>
+
 </mapper>

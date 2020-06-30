@@ -46,7 +46,98 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				}
 			})
 
+            //TODO 点击全选按钮，全部选中复选框。
+            // Dom对象转换Jquery对象 $(dom对象) ，要方便调用jquery方法。 val() prop() ....
+            // Jquery对象转换Dom对象 jquery对象[0]
+            $("#flagAll").click(function () {
+                //获取所有的复选框
+                // var flags = $("input[name=flag]");
+
+                //方式1，使用for循环
+                // for(var i=0; i<flags.length;i++){
+                //     // flags[i].checked = $("#flagAll").prop("checked");
+                //     flags[i].checked = $(this).prop("checked");
+                // }
+
+                //方式2，使用$.each循环
+                // $.each(flags,function (i,n) {
+                //     n.checked = $("#flagAll").prop("checked");
+                // })
+
+                //方式3，通过通过使用prop方法来批量设置复选框的选中状态。
+                //参数1，设置的key，要设置的属性
+                //参数2，给参数1设置的属性值
+                //全选，点击全选按钮，全部选中其他复选框。
+                $("input[name=flag]").prop("checked", $("#flagAll").prop("checked"));
+
+
+            })
+
+            //TODO 删除操作
+            //点击删除按钮，校验
+            $("#deleteBtn").click(function () {
+                //如果未选中，弹出提示
+                if($("input[name=flag]:checked").length == 0){
+                    alert("删除操作，请至少选中一条数据")
+                    //弹出框后，一定要return，避免向下执行。
+                    return ;
+                }
+
+                //url参数,http://localhost:8080/crm/xxxx.do?key=value&key=value
+                //获取选中的jquery对象
+                //定义数组，封装参数
+                // var param = [];
+                // alert($("input[name=flag]:checked"))
+                // $.each($("input[name=flag]:checked"),function (i, n) {
+                    // alert($(n).val())
+                    // param.push($(n).val())
+                // })
+
+                //定义字符串，封装参数
+                var param = "?";
+                $.each($("input[name=flag]:checked"),function (i, n) {
+                    param += "codes=" + $(n).val();
+                    if(i < $("input[name=flag]:checked").length -1){
+                        param += "&"
+                    }
+
+                })
+
+                // alert(param)
+                    if(confirm("您确定要删除吗？")){
+                        $.ajax({
+                            url: "settings/dictionary/type/deleteByCodes.do" + param,
+                            data: {},
+                            type: "get",
+                            dataType: "json",
+                            success: function (data) {
+
+                                //data : {success : true/false ,msg : xxx}
+                                if (data.success) {
+                                    //删除成功
+                                    // alert("恭喜你，删除成功！");
+                                    window.location.href = "settings/dictionary/type/toDicTypeIndex.do";
+                                } else {
+                                    alert(data.msg)
+                                }
+
+                            }
+                        });
+                    }
+            })
+
+
 		})
+
+        function reSelect() {
+            //反选，点击全部的复选框，选中全选复选框
+            $("#flagAll").prop(
+                "checked",
+                $("input[name=flag]").length == $("input[name=flag]:checked").length?true:false
+            )
+        }
+
+
 
 	</script>
 </head>
@@ -65,14 +156,14 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		  <button type="button" class="btn btn-primary" onclick="window.location.href='settings/dictionary/type/toDicTypeSave.do'"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				<%--onclick="window.location.href='edit.jsp'"--%>
 		  <button id="updateBtn" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-edit"></span> 编辑</button>
-		  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+		  <button id="deleteBtn" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 		</div>
 	</div>
 	<div style="position: relative; left: 30px; top: 20px;">
 		<table class="table table-hover">
 			<thead>
 				<tr style="color: #B3B3B3;">
-					<td><input type="checkbox" /></td>
+					<td><input id="flagAll" type="checkbox" /></td>
 					<td>序号</td>
 					<td>编码</td>
 					<td>名称</td>
@@ -114,7 +205,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 								name属性：可以根据属性获取多个选中的复选框
 								value属性：通过选中的复选框的jquery对象通过val()方法获取value属性值
 						--%>
-						<td><input name="flag" value="${dt.code}" type="checkbox" /></td>
+						<td><input name="flag" onclick="reSelect()" value="${dt.code}" type="checkbox" /></td>
 						<td>${a.count}</td>
 						<td>${dt.code}</td>
 						<td>${dt.name}</td>

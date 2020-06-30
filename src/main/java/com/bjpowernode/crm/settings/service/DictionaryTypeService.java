@@ -15,4 +15,9 @@ public interface DictionaryTypeService {
     DicType findDicTypeByCode(String code);
 
     void updateDicType(DicType dicType);
+
+    void deleteByCodes(String[] codes);
+
+    List<String> findAllDicCode();
+
 }

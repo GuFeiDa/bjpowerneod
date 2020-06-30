@@ -131,6 +131,17 @@
         </includes>
         <filtering>false</filtering>
       </resource>
+      <!--将webapp下的所有jsp，
+      打包到类路径下的/META-INF/resources目录下
+      /target/classes/META-INF/resources目录下-->
+      <!--<resource>-->
+        <!--<directory>src/main/webapp</directory>-->
+        <!--<includes>-->
+          <!--<include>**/*.jsp</include>-->
+        <!--</includes>-->
+        <!--<targetPath>/META-INF/resources</targetPath>-->
+      <!--</resource>-->
+
     </resources>
     <plugins>
       <!-- 编码和编译和JDK版本 -->
@@ -144,5 +155,6 @@
       </plugin>
     </plugins>
   </build>
+
 
 </project>

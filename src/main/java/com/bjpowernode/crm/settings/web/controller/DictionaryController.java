@@ -2,14 +2,18 @@ package com.bjpowernode.crm.settings.web.controller;
 
 import com.bjpowernode.crm.exception.TraditionRequestException;
 import com.bjpowernode.crm.settings.domain.DicType;
+import com.bjpowernode.crm.settings.domain.DicValue;
 import com.bjpowernode.crm.settings.service.DictionaryTypeService;
+import com.bjpowernode.crm.settings.service.DictionaryValueService;
 import com.bjpowernode.crm.utils.HandleFlag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,7 @@ public class DictionaryController {
     @Autowired
     private DictionaryTypeService dictionaryTypeService;
 
+    //----------------------字典类型---------------------华丽的分割线---------------------------------------------------
     /**
      * 跳转到字典首页
      * @return
@@ -125,6 +130,80 @@ public class DictionaryController {
 
         return "redirect:/settings/dictionary/type/toDicTypeIndex.do";
     }
+
+    @RequestMapping("/type/deleteByCodes.do")
+    @ResponseBody
+    public Map<String,Object> deleteByCodes(String[] codes){
+        System.out.println(Arrays.toString(codes));
+        dictionaryTypeService.deleteByCodes(codes);
+        return HandleFlag.successTrue();
+    }
+
+    //----------------------字典类型---------------------华丽的分割线---------------------------------------------------
+
+    //------------------------字典值-------------------华丽的分割线---------------------------------------------------
+
+    @Autowired
+    private DictionaryValueService dictionaryValueService;
+
+    /**
+     * 查询字典值列表
+     * @return
+     */
+    @RequestMapping("/value/toDicValueIndex.do")
+    public ModelAndView toDicValueIndex(){
+        ModelAndView mv = new ModelAndView();
+        List<DicValue> dvList = dictionaryValueService.findValueAll();
+        mv.addObject("dvList",dvList);
+        mv.setViewName("/settings/dictionary/value/index");
+        return mv;
+    }
+
+    /**
+     * 跳转到save.jsp页面
+     * @return
+     */
+    @RequestMapping("/value/toValueSave.do")
+    public ModelAndView toValueSave(){
+        ModelAndView mv = new ModelAndView();
+        //在save.jsp页面需要使用到字典类型编码列表下拉框
+//        List<DicType> dtList = dictionaryTypeService.findAllDicType();
+        List<String> codeList = dictionaryTypeService.findAllDicCode();
+        System.out.println(codeList);
+        mv.setViewName("/settings/dictionary/value/save");
+        mv.addObject("cList",codeList);
+        return mv;
+    }
+
+
+    /**
+     * 根据编码和属性值查询
+     * @param dicValue
+     * @return
+     */
+    @RequestMapping("/value/findByCodeOrValue.do")
+    @ResponseBody
+//    public Map<String,Object> findByCodeOrValue(String typeCode,String value){
+//    public Map<String,Object> findByCodeOrValue(DicValue dicValue){
+    //这种方式的封装，是应对前台传递的参数，后台无法使用实体类进行封装
+    //这样传递的方式，更灵活。
+    //一定要添加@RequestParam注解，来将传递的参数封装到集合中。
+    //@RequestParam，请求参数。
+    public Map<String,Object> findByCodeOrValue(@RequestParam Map<String,String> dicValue){
+        System.out.println(dicValue);
+        Map<String,Object> result = dictionaryValueService.findByCodeOrValue(dicValue);
+        return result;
+    }
+
+
+    @RequestMapping("/value/saveDicValue.do")
+    public String saveDicValue(DicValue dicValue) throws TraditionRequestException{
+        dictionaryValueService.saveDicValue(dicValue);
+        return "redirect:/settings/dictionary/value/toDicValueIndex.do";
+    }
+
+
+    //------------------------字典值-------------------华丽的分割线---------------------------------------------------
 
 
 }

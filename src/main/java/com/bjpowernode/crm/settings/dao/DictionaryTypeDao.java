@@ -37,4 +37,16 @@ public interface DictionaryTypeDao {
      * @param dicType
      */
     void updateDicType(DicType dicType);
+
+    /**
+     * 根据codes批量删除
+     * @param codes
+     */
+    void deleteByCodes(String[] codes);
+
+    /**
+     * 查询所有字典类型编码列表
+     * @return
+     */
+    List<String> findAllDicCode();
 }

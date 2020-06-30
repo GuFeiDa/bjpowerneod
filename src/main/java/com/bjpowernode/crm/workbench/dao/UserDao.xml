@@ -10,4 +10,14 @@
     <select id="login" resultType="user">
         select * from tbl_user where loginAct = #{loginAct} and loginPwd = #{loginPwd}
     </select>
+
+    <!--List<User> findAllUser();
+
+            select * from tbl_user 注意，这里面有密码，注意，注意
+
+            select id,name from tbl_user
+    -->
+    <select id="findAllUser" resultType="User">
+        select id,name from tbl_user
+    </select>
 </mapper>

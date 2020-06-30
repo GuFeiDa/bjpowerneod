@@ -49,4 +49,14 @@ public class DictionaryTypeServiceImpl implements DictionaryTypeService {
     public void updateDicType(DicType dicType) {
         dictionaryTypeDao.updateDicType(dicType);
     }
+
+    @Override
+    public void deleteByCodes(String[] codes) {
+        dictionaryTypeDao.deleteByCodes(codes);
+    }
+
+    @Override
+    public List<String> findAllDicCode() {
+        return dictionaryTypeDao.findAllDicCode();
+    }
 }

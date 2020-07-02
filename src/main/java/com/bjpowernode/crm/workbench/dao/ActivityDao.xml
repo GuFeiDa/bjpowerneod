@@ -9,7 +9,18 @@
 
         u.name as owner 将user表的name字段封装到Activity实体类的owner属性中
 
-        select * from tbl_activity a , tbl_user u where a.owner = u.id;
+        select * from tbl_activity a , tbl_user u where a.owner = u.id
+
+        查询市场活动列表和关键字查询整合到一个sql语句中
+        通过动态sql来进行判断
+        如果刷新列表，没有查询条件的
+        如果有查询条件，市场活动名称要模糊查询
+
+        大于 greater then  缩写 gt
+        小于 less then 缩写 lt
+        等于 eq
+        大于等于  ge
+        小于等于  le
     -->
     <select id="findAllActivity" resultType="Activity">
         select
@@ -23,6 +34,19 @@
         a.createTime,
         a.createBy
          from tbl_activity a inner join tbl_user u on a.owner = u.id
+         <where>
+             <if test="name != null and name != ''">
+                 and a.name like '%' #{name} '%'
+             </if>
+             <if test="startDate != null and startDate != ''">
+                and a.startDate &gt;= #{startDate}
+             </if>
+             <if test="endDate != null and endDate != ''">
+                 and a.endDate &lt;= #{endDate}
+             </if>
+         </where>
+         and u.id = #{userId}
+         limit #{pageNo} , #{pageSize}
     </select>
 
     <!--void saveActivity(Activity activity);-->
@@ -52,5 +76,32 @@
         #{createBy}
         )
     </insert>
+
+    <!--Long findActivityCount(Map<String,Object> paramMap);-->
+    <select id="findActivityCount" resultType="java.lang.Long">
+        select count(*) from tbl_activity a , tbl_user u
+        <where>
+            <if test="name != null and name != ''">
+                and a.name like '%' #{name} '%'
+            </if>
+            <if test="startDate != null and startDate != ''">
+                and a.startDate &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                and a.endDate &lt;= #{endDate}
+            </if>
+         and a.owner = u.id and u.id = #{userId}
+        </where>
+    </select>
+
+    <!--void deleteByIds(String[] activityIds);
+        delete from tbl_activity where id in (xx,xx,xx)
+    -->
+    <delete id="deleteByIds">
+        delete from tbl_activity where id in
+        <foreach collection="array" item="aId" open="(" close=")" separator=",">
+            #{aId}
+        </foreach>
+    </delete>
 
 </mapper>

@@ -18,6 +18,9 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
+<link rel="stylesheet" type="text/css" href="jquery/bs_pagination/jquery.bs_pagination.min.css">
+<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 
 <script type="text/javascript">
 
@@ -124,8 +127,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						// $("#saveForm").reset();
 
 						//跳转到市场活动的首页
-						window.location.href = "workbench/activity/toActivityIndex.do";
-
+						// window.location.href = "workbench/activity/toActivityIndex.do";
+						getPageList(1,5);
 					}else{
 						alert(data.msg)
 					}
@@ -135,8 +138,171 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		})
 
 
-		
+		//TODO 3.封装加载页面的列表方法
+		getPageList(1,5);
+
+		//TODO 4.全选/反选
+		//完成页面的全选/反选
+		$("#selectAll").click(function () {
+			//将所有的复选框，进行选中/取消操作
+			$("input[name=flag]").prop("checked", $("#selectAll").prop("checked") )
+		})
+
+		//获取tbody对象，操作的是它里面的子标签，给它的子标签绑定事件
+		//参数1，事件的名称
+		//参数2，绑定的对象，一个或多个
+		//执行事件的回调方法
+		$("#activityTbody").on("click",$("input[name=flag]"),function () {
+			// alert("hello world")
+			//反选操作，当复选框全部选中，将全选按钮，自动勾选。
+			$("#selectAll").prop(
+					"checked",
+					$("input[name=flag]").length == $("input[name=flag]:checked").length
+			)
+
+		})
+
+
+		//TODO 5.删除，一个/多个
+		//点击删除按钮时，执行的业务逻辑
+		$("#deleteBtn").click(function () {
+		if(confirm("确定要删除吗？")){
+			//校验
+			var flags = $("input[name=flag]:checked");
+			if( flags.length == 0 ){
+				//没有选中要删除的数据，提示
+				alert("亲，请至少选择一条要删除的数据")
+			}else{
+				//已选中数据了
+				//参数拼接，删除提交的参数是一个或多个市场活动的ID
+				var activityIds = "";
+
+				//获取所有选中的复选框对象，通过该对象获取value属性
+				$.each(flags,function (i, n) {
+					//通过dom对象获取value属性
+					// activityIds += "activityIds=" + n.value;
+
+					//通过jquery对象获取value属性
+					activityIds += "activityIds=" + $(n).val();
+
+					//拼接参数符号
+					if(i<flags.length -1){
+						activityIds+="&"
+					}
+				})
+				// alert(activityIds)
+				$.ajax({
+					url: "workbench/activity/deleteByIds.do?"+activityIds,
+					data: {
+
+					},
+					type: "post",
+					dataType:"json",
+					success: function(data){
+
+						//data : { success:true/false , msg: xxx }
+						if(data.success){
+							//删除成功，跳转到当前页
+							getPageList(
+									$("#activityPage").bs_pagination('getOption', 'currentPage'),
+									$("#activityPage").bs_pagination('getOption', 'rowsPerPage')
+							)
+						}else{
+							//删除失败
+							alert(data.msg);
+						}
+					}
+				});
+			}
+		}
+		})
+
+
+
 	});
+
+
+	function getPageList(pageNo,pageSize) {
+		//发送ajax请求，然后刷新列表
+		//注意：正常查询少量条件使用get请求，多个参数使用post请求
+		//js里面可以不包过双引号的，但是，后面学习使用的一些工具，就必须严格区分json格式。
+
+		//将当前页，进行计算，算出查询页码的索引值
+		var pageNoInx = ((pageNo-1) * pageSize);
+
+		var name = $.trim( $("#search-name").val() );
+		var startDate = $.trim( $("#search-startDate").val() );
+		var endDate = $.trim( $("#search-endDate").val() );
+
+		$.ajax({
+			url: "workbench/activity/getPageList.do",
+			data: {
+				"pageNo":pageNoInx,
+				"pageSize":pageSize,
+				"userId":"${user.id}",
+				"name":name,
+				"startDate":startDate,
+				"endDate":endDate
+			},
+			type: "post",
+			dataType:"json",
+			success: function(data){
+
+				//data : {success:true/false,msg:xxx,aList:[{activity1},{activity2}...],total:xxx}
+				if(data.success){
+					//请求成功，加载列表
+					//定义一个html变量，用于拼接html标签
+					var html = "";
+
+					//每个n，就代表着每个activity对象
+					$.each(data.aList , function (i, n) {
+						//拼接html变量
+						html += '<tr class="active">';
+						//复选框的属性设置name，批量操作
+						html += '<td><input name="flag" value='+n.id+' type="checkbox" /></td>';
+						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/toDetail.do?id='+n.id+'\';">'+n.name+'</a></td>';
+						// html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.do?id='+n.id+'\';">'+n.name+'</a></td>';
+						html += '<td>'+n.owner+'</td>';
+						html += '<td>'+n.startDate+'</td>';
+						html += '<td>'+n.endDate+'</td>';
+						html += '</tr>';
+					})
+
+					//加载html
+					$("#activityTbody").html(html);
+
+					//计算总页数,总页数=总记录数/每页条数
+					//20 / 5 = 4页， 21 / 5 = 5页
+					var totalPages = data.total % pageSize == 0 ? data.total / pageSize : parseInt(data.total / pageSize) + 1;
+					//加载分页插件
+					$("#activityPage").bs_pagination({
+						currentPage: pageNo, // 页码
+						rowsPerPage: pageSize, // 每页显示的记录条数
+						maxRowsPerPage: 20, // 每页最多显示的记录条数
+						totalPages: totalPages, // 总页数
+						totalRows: data.total, // 总记录条数
+
+						visiblePageLinks: 3, // 显示几个卡片
+
+						showGoToPage: true,
+						showRowsPerPage: true,
+						showRowsInfo: true,
+						showRowsDefaultInfo: true,
+
+						onChangePage : function(event, data){
+							getPageList(data.currentPage , data.rowsPerPage);
+						}
+					});
+
+
+				}else{
+					//请求失败
+					alert(data.msg);
+				}
+			}
+		});
+	}
+
 	
 </script>
 </head>
@@ -331,32 +497,32 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">名称</div>
-				      <input class="form-control" type="text">
+				      <input id="search-name" class="form-control" type="text">
 				    </div>
 				  </div>
 				  
-				  <div class="form-group">
-				    <div class="input-group">
-				      <div class="input-group-addon">所有者</div>
-				      <input class="form-control" type="text">
-				    </div>
-				  </div>
+				  <%--<div class="form-group">--%>
+				    <%--<div class="input-group">--%>
+				      <%--<div class="input-group-addon">所有者</div>--%>
+				      <%--<input id="search-owner" class="form-control" type="text">--%>
+				    <%--</div>--%>
+				  <%--</div>--%>
 
 
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="startTime" />
+					  <input id="search-startDate" class="form-control dateTime" autocomplete="off" readonly type="text" id="startTime" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="endTime">
+					  <input id="search-endDate" class="form-control dateTime" autocomplete="off" readonly type="text" id="endTime">
 				    </div>
 				  </div>
 				  
-				  <button type="submit" class="btn btn-default">查询</button>
+				  <button onclick="getPageList(1,5)" type="button" class="btn btn-default">查询</button>
 				  
 				</form>
 			</div>
@@ -377,7 +543,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					--%>
 				  <button id="saveBtn" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> 创建</button>
 				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
-				  <button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
+				  <button id="deleteBtn" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
 				<div class="btn-group" style="position: relative; top: 18%;">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal" ><span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）</button>
@@ -389,23 +555,30 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				<table class="table table-hover">
 					<thead>
 						<tr style="color: #B3B3B3;">
-							<td><input type="checkbox" /></td>
+							<td><input id="selectAll" type="checkbox" /></td>
 							<td>名称</td>
                             <td>所有者</td>
 							<td>开始日期</td>
 							<td>结束日期</td>
 						</tr>
 					</thead>
-					<tbody>
-						<c:forEach items="${aList}" var="a">
-							<tr class="active">
-								<td><input type="checkbox" /></td>
-								<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">${a.name}</a></td>
-								<td>${a.owner}</td>
-								<td>${a.startDate}</td>
-								<td>${a.endDate}</td>
-							</tr>
-						</c:forEach>
+					<tbody id="activityTbody">
+					<%--
+						列表加载的时机：
+							1.进入市场活动页面，需要加载列表
+							2.通过点击页面上的分页按钮，加载列表
+							3.点击页面的创建、修改、删除按钮，操作完毕后，需要加载列表
+							4.在页面的搜索条件中，添加条件，需要加载列表
+					--%>
+						<%--<c:forEach items="${aList}" var="a">--%>
+							<%--<tr class="active">--%>
+								<%--<td><input type="checkbox" /></td>--%>
+								<%--<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">${a.name}</a></td>--%>
+								<%--<td>${a.owner}</td>--%>
+								<%--<td>${a.startDate}</td>--%>
+								<%--<td>${a.endDate}</td>--%>
+							<%--</tr>--%>
+						<%--</c:forEach>--%>
                         <%--<tr class="active">--%>
                             <%--<td><input type="checkbox" /></td>--%>
                             <%--<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href='detail.jsp';">发传单</a></td>--%>
@@ -416,41 +589,44 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 					</tbody>
 				</table>
 			</div>
-			
-			<div style="height: 50px; position: relative;top: 30px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
-				</div>
-			</div>
+
+			<%--创建的div标签，用于动态的填充分页插件--%>
+			<div id="activityPage"></div>
+
+			<%--<div style="height: 50px; position: relative;top: 30px;">--%>
+				<%--<div>--%>
+					<%--<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>--%>
+				<%--</div>--%>
+				<%--<div class="btn-group" style="position: relative;top: -34px; left: 110px;">--%>
+					<%--<button type="button" class="btn btn-default" style="cursor: default;">显示</button>--%>
+					<%--<div class="btn-group">--%>
+						<%--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">--%>
+							<%--10--%>
+							<%--<span class="caret"></span>--%>
+						<%--</button>--%>
+						<%--<ul class="dropdown-menu" role="menu">--%>
+							<%--<li><a href="#">20</a></li>--%>
+							<%--<li><a href="#">30</a></li>--%>
+						<%--</ul>--%>
+					<%--</div>--%>
+					<%--<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>--%>
+				<%--</div>--%>
+				<%--<div style="position: relative;top: -88px; left: 285px;">--%>
+					<%--<nav>--%>
+						<%--<ul class="pagination">--%>
+							<%--<li class="disabled"><a href="#">首页</a></li>--%>
+							<%--<li class="disabled"><a href="#">上一页</a></li>--%>
+							<%--<li class="active"><a href="#">1</a></li>--%>
+							<%--<li><a href="#">2</a></li>--%>
+							<%--<li><a href="#">3</a></li>--%>
+							<%--<li><a href="#">4</a></li>--%>
+							<%--<li><a href="#">5</a></li>--%>
+							<%--<li><a href="#">下一页</a></li>--%>
+							<%--<li class="disabled"><a href="#">末页</a></li>--%>
+						<%--</ul>--%>
+					<%--</nav>--%>
+				<%--</div>--%>
+			<%--</div>--%>
 			
 		</div>
 		

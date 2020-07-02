@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ActivityServiceImpl implements ActivityService {
@@ -16,12 +17,25 @@ public class ActivityServiceImpl implements ActivityService {
 
 
     @Override
-    public List<Activity> findAllActivity() {
-        return activityDao.findAllActivity();
+    public List<Activity> findAllActivity(Map<String,Object> paramMap) {
+        return activityDao.findAllActivity(paramMap);
     }
 
     @Override
     public void saveActivity(Activity activity) {
         activityDao.saveActivity(activity);
+    }
+
+    @Override
+    public Long findActivityCount(Map<String,Object> paramMap) {
+        return activityDao.findActivityCount(paramMap);
+    }
+
+    @Override
+    public void deleteByIds(String[] activityIds) {
+        //方式1，通过for循环遍历，一个一个删除
+
+        //方式2，通过动态sql的方式，进行循环删除
+        activityDao.deleteByIds(activityIds);
     }
 }

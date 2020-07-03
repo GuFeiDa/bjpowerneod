@@ -31,4 +31,32 @@ public interface ActivityDao {
      * @param activityIds
      */
     void deleteByIds(String[] activityIds);
+
+    /**
+     * 根据id查询市场活动
+     * @param id
+     * @return
+     */
+    Activity findById(String id);
+
+    /**
+     * 根据ID更新市场活动
+     * @param activity
+     */
+    void updateById(Activity activity);
+
+    List<Activity> findAll();
+
+    /**
+     * 根据ids查询市场活动列表
+     * @param activityIds
+     * @return
+     */
+    List<Activity> findByIds(String[] activityIds);
+
+    /**
+     * 批量插入数据到数据库中
+     * @param aList
+     */
+    void saveActivityList(List<Activity> aList);
 }

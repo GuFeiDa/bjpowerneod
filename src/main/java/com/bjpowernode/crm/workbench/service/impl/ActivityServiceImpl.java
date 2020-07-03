@@ -38,4 +38,29 @@ public class ActivityServiceImpl implements ActivityService {
         //方式2，通过动态sql的方式，进行循环删除
         activityDao.deleteByIds(activityIds);
     }
+
+    @Override
+    public Activity findById(String id) {
+        return activityDao.findById(id);
+    }
+
+    @Override
+    public void updateById(Activity activity) {
+        activityDao.updateById(activity);
+    }
+
+    @Override
+    public List<Activity> findAll() {
+        return activityDao.findAll();
+    }
+
+    @Override
+    public List<Activity> findByIds(String[] activityIds) {
+        return activityDao.findByIds(activityIds);
+    }
+
+    @Override
+    public void saveActivityList(List<Activity> aList) {
+        activityDao.saveActivityList(aList);
+    }
 }

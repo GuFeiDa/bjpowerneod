@@ -104,4 +104,84 @@
         </foreach>
     </delete>
 
+    <!--Activity findById(String id);-->
+    <select id="findById" resultType="Activity">
+        select * from tbl_activity where id = #{id}
+    </select>
+
+    <!--void updateById(Activity activity);-->
+    <update id="updateById">
+        update tbl_activity
+        <set>
+            <if test="owner != null and owner != ''">
+                owner = #{owner},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="startDate != null and startDate != ''">
+                startDate = #{startDate},
+            </if>
+            <if test="endDate != null and endDate != ''">
+                endDate = #{endDate},
+            </if>
+            <if test="cost != null and cost != ''">
+                cost = #{cost},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="editTime != null and editTime != ''">
+                editTime = #{editTime},
+            </if>
+            <if test="editBy != null and editBy != ''">
+                editBy = #{editBy},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findAll" resultType="Activity">
+        select * from tbl_activity
+    </select>
+
+    <!--List<Activity> findByIds(String[] activityIds);-->
+    <select id="findByIds" resultType="Activity">
+        select * from tbl_activity
+        where id in
+        <foreach collection="array" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <!--void saveActivityList(List<Activity> aList);-->
+    <insert id="saveActivityList">
+        insert into tbl_activity
+        (
+        id,
+        name,
+        owner,
+        startDate,
+        endDate,
+        cost,
+        description,
+        createTime,
+        createBy
+        )
+        values
+        <foreach collection="list" item="a" separator=",">
+            (
+            #{a.id},
+            #{a.name},
+            #{a.owner},
+            #{a.startDate},
+            #{a.endDate},
+            #{a.cost},
+            #{a.description},
+            #{a.createTime},
+            #{a.createBy}
+            )
+        </foreach>
+    </insert>
+
 </mapper>

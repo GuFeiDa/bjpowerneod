@@ -218,6 +218,215 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 		})
 
 
+		//TODO 6.点击修改打开模态窗口
+		//在打开模态窗口之前，先进行校验以及数据的查询和回显操作
+		$("#editBtn").click(function () {
+			//校验，选中数量，只能选中一条
+			var flags = $("input[name=flag]:checked");
+			// alert(flags.val())
+			if(flags.length == 1){
+				//可以进行修改
+				//获取选中的数据，在后台进行查询
+				$.ajax({
+					url: "workbench/activity/findById.do",
+					data: {
+						"id": flags.val()
+					},
+					type: "get",
+					dataType:"json",
+					success: function(data){
+						//data : { success:true/false, msg: xxx, a : {id...} }
+						if(data.success){
+							//查询市场活动对象成功
+							//修改的模态窗口中，包含所有者的下拉列表，需要去获取所有者的下拉列表数据
+							var activity = data.a;
+
+							//TODO 注意，此时设计的业务逻辑需要发送多次请求，获取数据。
+							$.ajax({
+								url: "workbench/activity/getUserList.do",
+								data: {
+
+								},
+								type: "get",
+								dataType:"json",
+								success: function(data){
+									//data : {success:true/false, msg: xxx, uList : [...]}
+
+
+									//给修改的模态窗口赋值
+									//给所有者赋值
+									var html = "";
+
+									$.each(data.uList,function (i, n) {
+										//别忘了给select标签设置name属性给option设置value属性
+										//owner=id
+										html += "<option value="+n.id+">"+n.name+"</option>";
+									})
+
+									//将html字符串插入到select标签中
+									$("#edit-owner").html(html);
+
+									//默认选中当前用户
+									$("#edit-owner").val("${user.id}");
+
+									//给隐藏域ID属性赋值
+									$("#edit-activityId").val(activity.id);
+
+									//显示其他属性
+									$("#edit-name").val(activity.name);
+									$("#edit-startDate").val(activity.startDate);
+									$("#edit-endDate").val(activity.endDate);
+									$("#edit-cost").val(activity.cost);
+									$("#edit-description").val(activity.description);
+
+									//打开模态窗口
+									$("#editActivityModal").modal("show");
+
+								}
+							});
+
+						}else{
+							alert("查询市场活动对象失败")
+						}
+					}
+				});
+			}else{
+				//没选中或选中多条
+				$("#msg").html("修改操作，只能选中一条数据");
+				return false;
+			}
+		})
+
+		//TODO 7.点击修改模态窗口的更新按钮，进行数据的更新
+		$("#editUpdateBtn").click(function () {
+			//校验
+			$.ajax({
+				url: "workbench/activity/updateById.do",
+				data: {
+					"id": $.trim( $("#edit-activityId").val() ),
+					"owner": $.trim( $("#edit-owner").val() ),
+					"name": $.trim( $("#edit-name").val() ),
+					"startDate": $.trim( $("#edit-startDate").val() ),
+					"endDate": $.trim( $("#edit-endDate").val() ),
+					"cost": $.trim( $("#edit-cost").val() ),
+					"description": $.trim( $("#edit-description").val() )
+				},
+				type: "post",
+				dataType:"json",
+				success: function(data){
+
+					//data : {success:true/false,msg:xxx}
+					if(data.success){
+						//更新成功，关闭模态窗口，刷新页面
+						$("#editActivityModal").modal("hide");
+
+						//清空表单数据
+						$("#edit-form").reset();
+
+						getPageList(
+								$("#activityPage").bs_pagination('getOption', 'currentPage'),
+								$("#activityPage").bs_pagination('getOption', 'rowsPerPage')
+						)
+					}else{
+						//更新失败，提示
+					}
+				}
+			});
+		})
+
+
+		//TODO 8.点击批量导出按钮
+		$("#exportActivityAllBtn").click(function () {
+			if(confirm("确定导出全部数据吗？")){
+				//点击确定，全部导出数据
+				window.location.href="workbench/activity/exportActivityAll.do";
+			}
+		})
+
+
+		//TODO 9.点击选择导出按钮
+		$("#exportActivityXzBtn").click(function () {
+			//判断是否选中
+			var flags = $("input[name=flag]:checked");
+			if(flags.length == 0){
+				alert("请至少选中一条/多条要导出的数据")
+				return;
+			}
+			if(confirm("您确定导出选中的数据吗？")){
+				//拼接请求参数
+				var param = "?";
+
+				$.each(flags,function (i, n) {
+					param += "activityIds=" + $(n).val();
+					if(i < flags.length -1){
+						param += "&";
+					}
+				})
+
+				// alert(param)
+				window.location.href="workbench/activity/exportActivitySelected.do"+param;
+
+				//取消已选中的状态
+			}
+		})
+
+		//TODO 10.上传Excel文件，将数据导入到数据库中
+		$("#importActivityBtn").click(function () {
+			var pageName = $("#activityFile").val(); // C:\fakepath\Activity-2020-07-03 14_50_52.xls
+			var suffix = pageName.substring(pageName.lastIndexOf(".")+1);
+			// alert(suffix)
+			//格式校验
+			if(suffix != "xls"){
+				//格式错误，提示
+				alert("请上传Excel后缀名为xls的文件")
+				return ;
+			}
+
+			//超过5M的文件，不允许上传
+			//可以上传的文件
+			// alert(JSON.stringify($("#activityFile").length))
+			var size = $("#activityFile")[0].files[0].size;
+			if(size < 1024 * 1024 * 5){
+				//可以上传
+				var formData=new FormData();
+				formData.append("myFile",$("#activityFile")[0].files[0]);
+
+
+				$.ajax({
+					url:'workbench/activity/importActivity.do',
+					data:formData,
+					type:'post',
+					// 主要是配合contentType使用的,默认情况下,
+					// ajax把所有数据进行applciation/x-www-form-urlencoded编码之前,
+					// 会把所有数据统一转化为字符串;把proccessData设置为false,可以阻止这种行为.
+					processData:false,
+					// 默认情况下,ajax向服务器发送数据之前,
+					// 把所有数据统一按照applciation/x-www-form-urlencoded编码格式进行编码;
+					// 把contentType设置为false,能够阻止这种行为.
+					contentType:false,
+					success:function(data){
+						//data : {success: true/false ,msg:xxx}
+						if(data.success){
+							//提示成功导入记录的条数
+							alert("导入数据成功");
+							$("#activityFile").val("");
+
+							//关闭模态窗口
+							$("#importActivityModal").modal("hide");
+							//刷新列表
+							getPageList(1,5);
+						}else{
+							alert("导入数据失败");
+						}
+					}
+				});
+
+			}else{
+				alert("文件太大，请上传小于5M的Excel文件")
+				return;
+			}
+
+		})
 
 	});
 
@@ -389,45 +598,47 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				</div>
 				<div class="modal-body">
 				
-					<form class="form-horizontal" role="form">
-					
+					<form id="edit-form" class="form-horizontal" role="form">
+
+						<%--创建一个隐藏域标签，存储市场活动的ID--%>
+						<input id="edit-activityId" type="hidden" >
 						<div class="form-group">
 							<label for="edit-marketActivityOwner" class="col-sm-2 control-label">所有者<span style="font-size: 15px; color: red;">*</span></label>
 							<div class="col-sm-10" style="width: 300px;">
-								<select class="form-control" id="edit-marketActivityOwner">
-								  <option>zhangsan</option>
-								  <option>lisi</option>
-								  <option>wangwu</option>
+								<select class="form-control" name="owner" id="edit-owner">
+								  <%--<option>zhangsan</option>--%>
+								  <%--<option>lisi</option>--%>
+								  <%--<option>wangwu</option>--%>
 								</select>
 							</div>
                             <label for="edit-marketActivityName" class="col-sm-2 control-label">名称<span style="font-size: 15px; color: red;">*</span></label>
                             <div class="col-sm-10" style="width: 300px;">
-                                <input type="text" class="form-control" id="edit-marketActivityName" value="发传单">
+                                <input type="text" class="form-control" name="name" id="edit-name" value="发传单">
                             </div>
 						</div>
 
 						<div class="form-group">
 							<label for="edit-startTime" class="col-sm-2 control-label">开始日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-startTime" value="2020-10-10">
+								<input type="text" class="form-control dateTime" autocomplete="off" readonly name="startDate" id="edit-startDate" value="2020-10-10">
 							</div>
 							<label for="edit-endTime" class="col-sm-2 control-label">结束日期</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-endTime" value="2020-10-20">
+								<input type="text" class="form-control dateTime" autocomplete="off" readonly name="endDate" id="edit-endDate" value="2020-10-20">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-cost" class="col-sm-2 control-label">成本</label>
 							<div class="col-sm-10" style="width: 300px;">
-								<input type="text" class="form-control" id="edit-cost" value="5,000">
+								<input type="text" class="form-control" name="cost" id="edit-cost" value="5,000">
 							</div>
 						</div>
 						
 						<div class="form-group">
 							<label for="edit-describe" class="col-sm-2 control-label">描述</label>
 							<div class="col-sm-10" style="width: 81%;">
-								<textarea class="form-control" rows="3" id="edit-describe">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
+								<textarea class="form-control" rows="3" name="description" id="edit-description">市场活动Marketing，是指品牌主办或参与的展览会议与公关市场活动，包括自行主办的各类研讨会、客户交流会、演示会、新产品发布会、体验会、答谢会、年会和出席参加并布展或演讲的展览会、研讨会、行业交流会、颁奖典礼等</textarea>
 							</div>
 						</div>
 						
@@ -436,7 +647,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
+					<button id="editUpdateBtn" type="button" class="btn btn-primary" data-dismiss="modal">更新</button>
 				</div>
 			</div>
 		</div>
@@ -454,7 +665,8 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
                 </div>
                 <div class="modal-body" style="height: 350px;">
                     <div style="position: relative;top: 20px; left: 50px;">
-                        请选择要上传的文件：<small style="color: gray;">[仅支持.xls或.xlsx格式]</small>
+                        <%--请选择要上传的文件：<small style="color: gray;">[仅支持.xls或.xlsx格式]</small>--%>
+                        请选择要上传的文件：<small style="color: gray;">[仅支持.xls]</small>
                     </div>
                     <div style="position: relative;top: 40px; left: 50px;">
                         <input type="file" id="activityFile">
@@ -542,11 +754,13 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 							$("#createActivityModal").modal("show/hide");打开或关闭模态窗口
 					--%>
 				  <button id="saveBtn" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> 创建</button>
-				  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
+				  <button id="editBtn" type="button" class="btn btn-default" data-toggle="modal" data-target="#editActivityModal"><span class="glyphicon glyphicon-pencil"></span> 修改</button>
 				  <button id="deleteBtn" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span> 删除</button>
 				</div>
+				<span id="msg"></span>
 				<div class="btn-group" style="position: relative; top: 18%;">
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#importActivityModal" ><span class="glyphicon glyphicon-import"></span> 上传列表数据（导入）</button>
+					<%--批量导出，是将数据库中tbl_activity表中所有数据全部导出--%>
                     <button id="exportActivityAllBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（批量导出）</button>
                     <button id="exportActivityXzBtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-export"></span> 下载列表数据（选择导出）</button>
                 </div>

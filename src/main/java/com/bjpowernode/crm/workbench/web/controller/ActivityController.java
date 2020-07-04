@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -313,6 +314,36 @@ public class ActivityController {
 
         return HandleFlag.successTrue();
     }
+
+
+    /**
+     * 点击市场活动的名称，跳转到市场活动的详情页面
+     *      页面内容：
+     *          市场活动的信息展示(根据id查询，并且只有一条)
+     *          市场活动详情列表信息展示(根据id外键查询，有多条数据)
+     *              如果数据比较少，我们可以在后台查询出来，通过ModelAndView进行跳转并封装数据
+     *              但是，市场活动详情列表信息，不一定有多少条数据，如果数据较多
+     *              从数据查询，耗时操作，此时页面是阻塞状态，没有内容，是一片空白
+     *      页面在加载市场活动信息时，使用后台根据id查询
+     *      页面在加载市场活动详情信息时，在页面使用ajax请求的方式，进行异步获取
+     *
+     *      主要为了用户体验，提升用户的体验。
+     * @param id
+     * @return
+     */
+    @RequestMapping("/toDetail.do")
+    public ModelAndView toDetail(String id){
+        //根据id，查询市场活动相关信息
+        Activity a = activityService.findActivity(id);
+
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("a",a);
+
+        mv.setViewName("/workbench/activity/detail");
+        return mv;
+    }
+
+
 
 
 }

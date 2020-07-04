@@ -184,4 +184,21 @@
         </foreach>
     </insert>
 
+    <!--根据id查询，市场活动信息，并将所有者进行转换为用户名称-->
+    <select id="findActivity" resultType="Activity">
+        select
+        a.id,
+        u.name as owner,
+        a.name,
+        a.startDate,
+        a.endDate,
+        a.cost,
+        a.description,
+        a.createTime,
+        a.createBy,
+        a.editTime,
+        a.editBy
+         from tbl_activity a , tbl_user u where a.id = #{id} and u.id = a.owner
+    </select>
+
 </mapper>

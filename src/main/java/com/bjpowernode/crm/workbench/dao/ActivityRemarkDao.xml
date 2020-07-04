@@ -4,5 +4,59 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.bjpowernode.crm.workbench.dao.ActivityRemarkDao">
 
+    <!--List<ActivityRemark> getActivityRemarkList(String activityId);-->
+    <select id="getActivityRemarkList" resultType="ActivityRemark">
+        select * from tbl_activity_remark where activityId = #{activityId}
+    </select>
 
+    <!--void saveActivityRemark(ActivityRemark activityRemark);-->
+    <insert id="saveActivityRemark">
+        insert into tbl_activity_remark
+        (
+        id,
+        noteContent,
+        createTime,
+        createBy,
+        editFlag,
+        activityId
+        )
+        values
+        (
+        #{id},
+        #{noteContent},
+        #{createTime},
+        #{createBy},
+        #{editFlag},
+        #{activityId}
+        )
+    </insert>
+
+    <!--void deleteActivityRemarkById(String id);-->
+    <delete id="deleteActivityRemarkById" >
+        delete from tbl_activity_remark where id = #{id}
+    </delete>
+
+    <!--void updateActivityRemark(ActivityRemark activityRemark);-->
+    <update id="updateActivityRemark">
+        update tbl_activity_remark
+        <set>
+            <if test="noteContent != null and noteContent != ''">
+                noteContent = #{noteContent},
+            </if>
+
+            <if test="editTime != null and editTime != ''">
+                editTime = #{editTime},
+            </if>
+
+            <if test="editBy != null and editBy != ''">
+                editBy = #{editBy},
+            </if>
+
+            <if test="editFlag != null and editFlag != ''">
+                editFlag = #{editFlag},
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

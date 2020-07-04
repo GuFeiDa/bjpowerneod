@@ -63,4 +63,9 @@ public class ActivityServiceImpl implements ActivityService {
     public void saveActivityList(List<Activity> aList) {
         activityDao.saveActivityList(aList);
     }
+
+    @Override
+    public Activity findActivity(String id) {
+        return activityDao.findActivity(id);
+    }
 }

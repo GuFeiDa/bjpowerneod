@@ -59,4 +59,11 @@ public interface ActivityDao {
      * @param aList
      */
     void saveActivityList(List<Activity> aList);
+
+    /**
+     * 根据id查询市场活动信息，为详情页面提供
+     * @param id
+     * @return
+     */
+    Activity findActivity(String id);
 }

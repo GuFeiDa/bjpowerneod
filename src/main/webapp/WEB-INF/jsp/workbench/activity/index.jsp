@@ -469,6 +469,7 @@ String basePath = request.getScheme() + "://" + request.getServerName() + ":" + 
 						html += '<tr class="active">';
 						//复选框的属性设置name，批量操作
 						html += '<td><input name="flag" value='+n.id+' type="checkbox" /></td>';
+						//TODO 11.点击市场活动名称，跳转到市场活动详情页面，携带的参数就是市场活动的ID
 						html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/toDetail.do?id='+n.id+'\';">'+n.name+'</a></td>';
 						// html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.do?id='+n.id+'\';">'+n.name+'</a></td>';
 						html += '<td>'+n.owner+'</td>';

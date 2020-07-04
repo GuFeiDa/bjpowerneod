@@ -15,6 +15,13 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * POI最重要的对象
+ *      HSSFWorkbook对象，工作簿对象，好比是Excel文件
+ *      HSSFSheet对象，页码对象，好比Excel文件中的对应的页码
+ *      HSSFRow对象，行对象，好比每一行记录
+ *      HSSFCell对象，行中的每一列对象
+ */
 public class PoiTest {
 
     /**

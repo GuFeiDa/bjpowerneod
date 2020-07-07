@@ -6,6 +6,7 @@ import com.bjpowernode.crm.workbench.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,5 +78,13 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public List<Activity> findActivityListLike(String activityName) {
         return activityDao.findActivityListLike(activityName);
+    }
+
+    @Override
+    public List<Activity> findRelationActivityListLike(String clueId, String activityName) {
+        Map<String,String> param = new HashMap<>();
+        param.put("clueId",clueId);
+        param.put("activityName",activityName);
+        return activityDao.findRelationActivityListLike(param);
     }
 }

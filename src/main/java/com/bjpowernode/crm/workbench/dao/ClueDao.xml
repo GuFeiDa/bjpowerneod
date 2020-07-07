@@ -97,6 +97,22 @@
         AND u.id = a.owner
     </select>
 
+    <!--List<Activity> getRelationActivityList(String clueId);-->
+    <select id="getRelationActivityList" resultType="Activity">
+        SELECT
+        a.id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name AS OWNER
+         FROM tbl_activity a ,tbl_user u
+        WHERE a.id IN
+        (
+          SELECT activityId FROM tbl_clue_activity_relation WHERE clueId = #{clueId}
+        )
+        AND u.id = a.owner
+    </select>
+
     <!--void addRelation(Map<String, Object> param);-->
     <!--void addRelation(String id,String clueId,String[] activityIds);-->
     <insert id="addRelation">
@@ -113,5 +129,11 @@
         #{activityId}
         )
     </insert>
+
+    <!--void deleteById(String clueId);-->
+    <delete id="deleteById">
+        delete from tbl_clue
+        where id = #{clueId}
+    </delete>
 
 </mapper>

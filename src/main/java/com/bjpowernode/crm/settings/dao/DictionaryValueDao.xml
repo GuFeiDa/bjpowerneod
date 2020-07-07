@@ -37,7 +37,7 @@
 
     <!--List<DicValue> findListByTypeCode(String code);-->
     <select id="findListByTypeCode" resultType="DicValue">
-        select * from tbl_dic_value where typeCode = #{code}
+        select * from tbl_dic_value where typeCode = #{code} order by orderNo asc
     </select>
 
 </mapper>

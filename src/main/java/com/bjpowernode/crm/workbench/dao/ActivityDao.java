@@ -80,4 +80,11 @@ public interface ActivityDao {
      * @return
      */
     List<Activity> findActivityListLike(String activityName);
+
+    /**
+     * 根据线索ID查询已关联的市场活动名称进行模糊查询
+     * @param param
+     * @return
+     */
+    List<Activity> findRelationActivityListLike(Map<String,String> param);
 }

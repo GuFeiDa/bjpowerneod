@@ -16,5 +16,9 @@ public interface ClueDao {
 
     List<Activity> getUnRelationActivityList(String clueId);
 
+    List<Activity> getRelationActivityList(String clueId);
+
     void addRelation(@Param("id") String id,@Param("clueId") String clueId ,@Param("activityId") String activityIds);
+
+    void deleteById(String clueId);
 }

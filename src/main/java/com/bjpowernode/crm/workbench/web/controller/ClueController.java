@@ -114,6 +114,13 @@ public class ClueController {
         return HandleFlag.successObj("aList",aList);
     }
 
+    @RequestMapping("/getRelationActivityList.do")
+    @ResponseBody
+    public Map<String,Object> getRelationActivityList(String clueId){
+        List<Activity> aList = clueService.getRelationActivityList(clueId);
+        return HandleFlag.successObj("aList",aList);
+    }
+
     @RequestMapping("/findActivityListLike.do")
     @ResponseBody
     public Map<String,Object> findActivityListLike(String activityName){
@@ -136,6 +143,29 @@ public class ClueController {
         mv.setViewName("/workbench/clue/convert");
 
         return mv;
+    }
+
+    /**
+     * 根据线索Id和市场活动名称模糊查询已关联的市场活动列表
+     * @param clueId
+     * @param activityName
+     * @return
+     */
+    @RequestMapping("/getRelationActivityListLike.do")
+    @ResponseBody
+    public Map<String,Object> getRelationActivityList(String clueId,String activityName) {
+        List<Activity> aList = activityService.findRelationActivityListLike(clueId,activityName);
+        return HandleFlag.successObj("aList",aList);
+    }
+
+    @RequestMapping("/exchangeClue.do")
+    public String exchangeClue(@RequestParam Map<String,String> parapMap,HttpSession session ){
+        parapMap.put("createTime",DateTimeUtil.getSysTime());//19位
+        parapMap.put("createBy",(((User)session.getAttribute("user")).getName()));
+        clueService.exchangeClue(parapMap);
+
+        //线索转换完成后，重定向到线索首页，加载页面
+        return "redirect:/workbench/clue/toClueIndex.do";
     }
 
 }

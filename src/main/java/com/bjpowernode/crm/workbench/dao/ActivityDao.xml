@@ -232,4 +232,24 @@
          from tbl_activity a , tbl_user u where a.name like '%' #{activityName} '%' and u.id = a.owner
     </select>
 
+    <select id="findRelationActivityListLike" resultType="Activity">
+        SELECT
+        a.id,
+        a.startDate,
+        a.endDate,
+        a.name,
+        u.name as owner
+        FROM
+        tbl_activity a , tbl_user u
+        WHERE
+        a.id IN
+        (
+        SELECT activityId FROM tbl_clue_activity_relation WHERE clueId = #{clueId}
+        )
+        AND
+        u.id = a.owner
+        AND
+        a.name LIKE '%' #{activityName} '%'
+    </select>
+
 </mapper>

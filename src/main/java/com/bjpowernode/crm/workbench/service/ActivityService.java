@@ -57,4 +57,12 @@ public interface ActivityService {
      * @return
      */
     List<Activity> findActivityListLike(String activityName);
+
+    /**
+     * 根据线索Id和市场活动名称模糊查询已关联的市场活动列表
+     * @param clueId
+     * @param activityName
+     * @return
+     */
+    List<Activity> findRelationActivityListLike(String clueId, String activityName);
 }

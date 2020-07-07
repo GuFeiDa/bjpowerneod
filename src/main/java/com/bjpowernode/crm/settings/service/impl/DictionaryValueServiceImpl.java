@@ -49,4 +49,9 @@ public class DictionaryValueServiceImpl implements DictionaryValueService {
         dicValue.setId(UUIDUtil.getUUID());
         dictionaryValueDao.saveDicValue(dicValue);
     }
+
+    @Override
+    public List<DicValue> findListByTypeCode(String code) {
+        return dictionaryValueDao.findListByTypeCode(code);
+    }
 }

@@ -43,4 +43,18 @@ public interface ActivityService {
      * @return
      */
     Activity findActivity(String id);
+
+    /**
+     * 根据线索id查询已关联的市场活动列表
+     * @param clueId
+     * @return
+     */
+    List<Activity> findActivityListByClueId(String clueId);
+
+    /**
+     * 根据市场活动名称进行模糊查询列表
+     * @param activityName
+     * @return
+     */
+    List<Activity> findActivityListLike(String activityName);
 }

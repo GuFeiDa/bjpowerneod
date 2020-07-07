@@ -16,6 +16,16 @@ public class Activity implements Serializable {
     private String editTime;
     private String editBy;
 
+    private String relationId;//线索表和市场活动的关联id，tbl_clue_activity_relation的主键ID
+
+    public String getRelationId() {
+        return relationId;
+    }
+
+    public void setRelationId(String relationId) {
+        this.relationId = relationId;
+    }
+
     public String getId() {
         return id;
     }

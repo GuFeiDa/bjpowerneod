@@ -35,4 +35,9 @@
         )
     </insert>
 
+    <!--List<DicValue> findListByTypeCode(String code);-->
+    <select id="findListByTypeCode" resultType="DicValue">
+        select * from tbl_dic_value where typeCode = #{code}
+    </select>
+
 </mapper>

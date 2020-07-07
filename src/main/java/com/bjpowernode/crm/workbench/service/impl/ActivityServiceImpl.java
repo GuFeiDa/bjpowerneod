@@ -68,4 +68,14 @@ public class ActivityServiceImpl implements ActivityService {
     public Activity findActivity(String id) {
         return activityDao.findActivity(id);
     }
+
+    @Override
+    public List<Activity> findActivityListByClueId(String clueId) {
+        return activityDao.findActivityListByClueId(clueId);
+    }
+
+    @Override
+    public List<Activity> findActivityListLike(String activityName) {
+        return activityDao.findActivityListLike(activityName);
+    }
 }

@@ -46,6 +46,11 @@
 
   </listener>
 
+  <!--加载服务器缓存的数据的监听器-->
+  <listener>
+    <listener-class>com.bjpowernode.crm.listener.SysLoadListener</listener-class>
+  </listener>
+
   <!--前端控制器-->
 
   <servlet>

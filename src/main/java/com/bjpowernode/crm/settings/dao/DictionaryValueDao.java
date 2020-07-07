@@ -25,4 +25,11 @@ public interface DictionaryValueDao {
      * @param dicValue
      */
     void saveDicValue(DicValue dicValue);
+
+    /**
+     * 根据类型编码查询对应的字典类型值集合
+     * @param code
+     * @return
+     */
+    List<DicValue> findListByTypeCode(String code);
 }

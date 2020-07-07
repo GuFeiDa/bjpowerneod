@@ -201,4 +201,35 @@
          from tbl_activity a , tbl_user u where a.id = #{id} and u.id = a.owner
     </select>
 
+    <!--List<Activity> findActivityListByClueId(String clueId);-->
+    <select id="findActivityListByClueId" resultType="Activity">
+        SELECT
+        car.id AS relationId,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name AS OWNER
+        FROM
+        tbl_activity a , tbl_clue_activity_relation car , tbl_clue c , tbl_user u
+        WHERE
+        c.id = #{clueId}
+        AND
+        car.clueId = c.id
+        AND
+        a.id = car.activityId
+        AND
+        u.id = a.owner;
+    </select>
+
+    <!--List<Activity> findActivityListLike(String activityName);-->
+    <select id="findActivityListLike" resultType="Activity">
+        select
+        a.id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name as owner
+         from tbl_activity a , tbl_user u where a.name like '%' #{activityName} '%' and u.id = a.owner
+    </select>
+
 </mapper>

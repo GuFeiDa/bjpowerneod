@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.workbench.dao.ClueDao">
+
+    <!--void saveClue(Clue clue);-->
+    <insert id="saveClue">
+        insert into tbl_clue
+        (
+        id,
+        fullname,
+        appellation,
+        owner,
+        company,
+        job,
+        email,
+        phone,
+        website,
+        mphone,
+        state,
+        source,
+        description,
+        contactSummary,
+        nextContactTime,
+        address,
+        createTime,
+        createBy
+        )
+        values
+        (
+        #{id},
+        #{fullname},
+        #{appellation},
+        #{owner},
+        #{company},
+        #{job},
+        #{email},
+        #{phone},
+        #{website},
+        #{mphone},
+        #{state},
+        #{source},
+        #{description},
+        #{contactSummary},
+        #{nextContactTime},
+        #{address},
+        #{createTime},
+        #{createBy}
+        )
+    </insert>
+
+    <!--Clue findById(String id);-->
+    <select id="findById" resultType="Clue">
+        select
+        c.id,
+        c.fullname,
+        c.appellation,
+        u.name as owner,
+        c.company,
+        c.job,
+        c.email,
+        c.phone,
+        c.website,
+        c.mphone,
+        c.state,
+        c.source,
+        c.description,
+        c.contactSummary,
+        c.nextContactTime,
+        c.address,
+        c.createTime,
+        c.createBy,
+        c.editTime,
+        c.editBy
+         from tbl_clue c , tbl_user u where c.id = #{id} and u.id = c.owner
+    </select>
+
+    <!--void deleteRelation(String relationId);-->
+    <delete id="deleteRelation">
+        delete from tbl_clue_activity_relation where id = #{relationId}
+    </delete>
+
+    <!--List<Activity> getUnRelationActivityList(String clueId);-->
+    <select id="getUnRelationActivityList" resultType="Activity">
+        SELECT
+        a.id,
+        a.name,
+        a.startDate,
+        a.endDate,
+        u.name AS OWNER
+         FROM tbl_activity a ,tbl_user u
+        WHERE a.id NOT IN
+        (
+          SELECT activityId FROM tbl_clue_activity_relation WHERE clueId = #{clueId}
+        )
+        AND u.id = a.owner
+    </select>
+
+    <!--void addRelation(Map<String, Object> param);-->
+    <!--void addRelation(String id,String clueId,String[] activityIds);-->
+    <insert id="addRelation">
+        insert into tbl_clue_activity_relation
+        (
+        id,
+        clueId,
+        activityId
+        )
+        values
+        (
+        #{id},
+        #{clueId},
+        #{activityId}
+        )
+    </insert>
+
+</mapper>

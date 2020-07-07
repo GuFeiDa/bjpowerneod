@@ -11,4 +11,6 @@ public interface DictionaryValueService {
     Map<String, Object> findByCodeOrValue(Map<String, String> dicValue);
 
     void saveDicValue(DicValue dicValue);
+
+    List<DicValue> findListByTypeCode(String code);
 }

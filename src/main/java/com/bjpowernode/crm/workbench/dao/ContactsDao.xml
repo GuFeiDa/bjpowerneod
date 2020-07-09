@@ -54,4 +54,13 @@
         )
     </insert>
 
+    <!--List<Contacts> findAll();-->
+    <select id="findAll" resultType="Contacts">
+        select
+         id,
+         fullname,
+         email,
+         mphone
+         from tbl_contacts
+    </select>
 </mapper>

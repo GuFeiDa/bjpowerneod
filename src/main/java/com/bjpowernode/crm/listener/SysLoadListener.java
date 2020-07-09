@@ -10,9 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SysLoadListener implements ServletContextListener {
 
@@ -20,7 +18,7 @@ public class SysLoadListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("...................load data start..................");
+        System.out.println("...................load dic data start..................");
 
         //创建Spring容器
         ApplicationContext app = new ClassPathXmlApplicationContext("classpath:spring/applicationContext.xml");
@@ -43,6 +41,34 @@ public class SysLoadListener implements ServletContextListener {
             sce.getServletContext().setAttribute(dicType.getCode()+"List",dicValueList);
         }
 
-        System.out.println("...................load data end   ..................");
+        System.out.println("...................load dic data end   ..................");
+
+        System.out.println("...................load stage possibility start   ..................");
+//        https://www.ip138.com/ascii/
+
+        //加载属性文件，指定属性文件的名称，要去掉后缀名称
+        Map<String,String> sMap = new HashMap<>();
+
+        ResourceBundle bundle = ResourceBundle.getBundle("properties/stagePossibility");
+        //set集合无序，唯一的。
+//        Set<String> keys = bundle.keySet();
+//        for (String key : keys) {
+//            String value = (String) bundle.getObject(key);
+//            sMap.put(key,value);
+//        }
+
+        Enumeration<String> keys = bundle.getKeys();
+        while (keys.hasMoreElements()){
+            String key = keys.nextElement();
+            String value = (String) bundle.getObject(key);
+            sMap.put(key,value);
+        }
+
+        System.out.println("...................sMap : "+sMap);
+
+        //将阶段和对应的可能性集合存入到服务器缓存中
+        sce.getServletContext().setAttribute("sMap",sMap);
+
+        System.out.println("...................load stage possibility end   ..................");
     }
 }

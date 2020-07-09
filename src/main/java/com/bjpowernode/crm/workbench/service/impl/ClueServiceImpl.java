@@ -4,6 +4,8 @@ import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.workbench.dao.*;
 import com.bjpowernode.crm.workbench.domain.*;
 import com.bjpowernode.crm.workbench.service.ClueService;
+
+import com.bjpowernode.crm.workbench.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -88,6 +90,9 @@ public class ClueServiceImpl implements ClueService {
     @Autowired
     private TranHistoryDao tranHistoryDao;
 
+    @Autowired
+    private TransactionService transactionService;
+
     /**
      * 线索转换业务逻辑： ( 将 线索 转换为 客户、联系人、客户备注、联系人备注 ，如果创建交易，6-10步骤 )
      *
@@ -150,6 +155,7 @@ public class ClueServiceImpl implements ClueService {
                     cust = new Customer();
                     //赋值操作
                     cust.setId(UUIDUtil.getUUID());
+                    parapMap.put("customerId",cust.getId());
                     cust.setAddress(clue.getAddress());
                     cust.setContactSummary(clue.getContactSummary());
                     cust.setCreateBy(createBy);
@@ -264,40 +270,8 @@ public class ClueServiceImpl implements ClueService {
             //6.是否创建交易，根据flag参数进行判断
             if("a".equals(flag)) {
                 //勾选了创建交易
-
-                //7.新增交易
-                Tran t = new Tran();
-                t.setId(UUIDUtil.getUUID());
-                t.setActivityId(activityId);
-                t.setContactsId(con.getId());
-                t.setContactSummary(clue.getContactSummary());
-                t.setCreateBy(createBy);
-                t.setCreateTime(createTime);
-                t.setCustomerId(cust.getId());
-                t.setDescription(clue.getDescription());
-                t.setExpectedDate(expectedDate);
-                t.setMoney(money);
-                t.setName(name);
-                t.setNextContactTime(clue.getNextContactTime());
-                t.setOwner(clue.getOwner());
-                t.setSource(clue.getSource());
-                t.setStage(stage);
-
-                //新增交易记录
-                tranDao.saveTran(t);
-
-                //交易历史记录
-                TranHistory th = new TranHistory();
-                th.setId(UUIDUtil.getUUID());
-                th.setCreateBy(createBy);
-                th.setCreateTime(createTime);
-                th.setExpectedDate(expectedDate);
-                th.setMoney(money);
-                th.setStage(stage);
-                th.setTranId(t.getId());
-
-                //新增交易历史记录
-                tranHistoryDao.saveTranHistory(th);
+                //将新增交易及历史记录进行抽取，抽取到TranService实现类中
+                transactionService.saveTran(parapMap);
 
                 //因为有外键关联
                 //线索和线索备注是一对多的关系，先删除外键数据

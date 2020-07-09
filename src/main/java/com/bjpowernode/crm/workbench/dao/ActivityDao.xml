@@ -142,7 +142,13 @@
     </update>
 
     <select id="findAll" resultType="Activity">
-        select * from tbl_activity
+        select
+         a.id,
+         a.name,
+         a.startDate,
+         a.endDate,
+         u.name as owner
+         from tbl_activity a, tbl_user u where a.owner = u.id
     </select>
 
     <!--List<Activity> findByIds(String[] activityIds);-->

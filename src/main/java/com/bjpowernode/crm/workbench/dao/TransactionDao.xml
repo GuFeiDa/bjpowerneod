@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bjpowernode.crm.workbench.dao.TransactionDao">
+
+   <!--List<String> getCustomerName(String name);-->
+    <select id="getCustomerName" resultType="string">
+        SELECT
+          NAME
+        FROM
+          tbl_customer
+        WHERE NAME LIKE '%' #{name} '%'
+    </select>
+
+</mapper>

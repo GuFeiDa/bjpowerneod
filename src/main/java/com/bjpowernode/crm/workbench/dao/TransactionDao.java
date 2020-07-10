@@ -1,5 +1,7 @@
 package com.bjpowernode.crm.workbench.dao;
 
+import com.bjpowernode.crm.workbench.domain.Tran;
+
 import java.util.List;
 
 public interface TransactionDao {
@@ -9,4 +11,8 @@ public interface TransactionDao {
      * @return
      */
     List<String> getCustomerName(String name);
+
+    Tran findById(String id);
+
+    void updateTransaction(Tran tran);
 }

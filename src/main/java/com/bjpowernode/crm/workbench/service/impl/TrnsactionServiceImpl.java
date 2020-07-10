@@ -119,4 +119,34 @@ public class TrnsactionServiceImpl implements TransactionService {
         //新增交易历史记录
         tranHistoryDao.saveTranHistory(th);
     }
+
+    @Override
+    public Tran findById(String id) {
+        return transactionDao.findById(id);
+    }
+
+    @Override
+    public Tran updateTranAndHistory(String id, String expectedDate, String stage, String money,String createBy,String createTime) {
+        //根据id将，tran对象查询出来
+        Tran tran = transactionDao.findById(id); //旧的交易对象
+        //将属性进行封装到tran对象中，回传到页面的tran对象
+        tran.setStage(stage);
+        tran.setEditBy(createBy);
+        tran.setEditTime(createTime);
+        //带着封装后的属性去进行修改操作
+        transactionDao.updateTransaction(tran);
+        //插入新的历史交易记录
+        TranHistory history = new TranHistory();
+        history.setId(UUIDUtil.getUUID());
+        history.setTranId(id);
+        history.setStage(stage);
+        history.setMoney(money);
+        history.setExpectedDate(expectedDate);
+        history.setCreateTime(createTime);
+        history.setCreateBy(createBy);
+
+        tranHistoryDao.saveTranHistory(history);
+
+        return tran;
+    }
 }

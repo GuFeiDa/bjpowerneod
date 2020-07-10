@@ -5,6 +5,7 @@ import com.bjpowernode.crm.utils.HandleFlag;
 import com.bjpowernode.crm.utils.UUIDUtil;
 import com.bjpowernode.crm.workbench.domain.Activity;
 import com.bjpowernode.crm.workbench.domain.Contacts;
+import com.bjpowernode.crm.workbench.domain.Tran;
 import com.bjpowernode.crm.workbench.domain.User;
 import com.bjpowernode.crm.workbench.service.ActivityService;
 import com.bjpowernode.crm.workbench.service.ContactsService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +102,43 @@ public class TransactionController {
         trnsactionService.saveTran(paramMap);
         //跳转到交易首页
         return "redirect:/workbench/transaction/toTranIndex.do";
+    }
+
+    @RequestMapping("/toTranDetail.do")
+    public ModelAndView toTranDetail(String id, HttpServletRequest request){
+        ModelAndView mv = new ModelAndView();
+
+        //获取缓存中的阶段和可能性对应的集合
+        Map<String,String> sMap = (Map<String, String>) request.getServletContext().getAttribute("sMap");
+
+
+        //根据交易id，去数据库查询
+        Tran tran = trnsactionService.findById(id);
+
+        //获取当前阶段
+        String stage = tran.getStage();
+
+        //去集合中查找对应的可能性
+        String possibility = sMap.get(stage);
+
+        //封装可能性到tran对象中
+        tran.setPossibility(possibility);
+
+        mv.setViewName("/workbench/transaction/detail");
+        mv.addObject("t",tran);
+
+        return mv;
+    }
+
+    @RequestMapping("/updateTranAndHistory.do")
+    @ResponseBody
+    public Map<String,Object> updateTranAndHistory(String id,String expectedDate,String stage,String money,HttpSession session,HttpServletRequest request){
+        Tran tran = trnsactionService.updateTranAndHistory(id,expectedDate,stage,money,((User)session.getAttribute("user")).getName(),DateTimeUtil.getSysTime());
+        //封装阶段对应的可能性
+        Map<String,String> sMap = (Map<String, String>) request.getServletContext().getAttribute("sMap");
+        String possibility = sMap.get(tran.getStage());
+        tran.setPossibility(possibility);
+        return HandleFlag.successObj("t",tran);
     }
 
 }

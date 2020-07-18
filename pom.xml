@@ -10,7 +10,7 @@
   <packaging>war</packaging>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -124,32 +124,62 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.17</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.30</version>
+    </dependency>
+
+    <dependency>
+      <groupId>redis.clients</groupId>
+      <artifactId>jedis</artifactId>
+      <version>2.9.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>2.6.0</version>
+    </dependency>
 
   </dependencies>
 
   <build>
+
     <resources>
+      <!--配置加载src/main/java目录下的dao的映射配置文件-->
+      <!--把该配置去掉，默认加载src/main/resources目录下的xml属性配置文件-->
       <resource>
-        <!--加载属性文件和映射配置文件-->
-        <directory>src/main/java</directory><!--所在的目录-->
-        <includes><!--包括目录下的.properties,.xml文件都会扫描到-->
-          <include>**/*.properties</include>
+        <directory>src/main/java</directory>
+        <filtering>false</filtering>
+        <includes>
           <include>**/*.xml</include>
         </includes>
-        <filtering>false</filtering>
       </resource>
-      <!--将webapp下的所有jsp，
-      打包到类路径下的/META-INF/resources目录下
-      /target/classes/META-INF/resources目录下-->
-      <!--<resource>-->
-        <!--<directory>src/main/webapp</directory>-->
-        <!--<includes>-->
-          <!--<include>**/*.jsp</include>-->
-        <!--</includes>-->
-        <!--<targetPath>/META-INF/resources</targetPath>-->
-      <!--</resource>-->
 
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*.xml</include>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
     </resources>
+
+
     <plugins>
       <!-- 编码和编译和JDK版本 -->
       <plugin>

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +27,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JedisPool jedisPool;
 
     /**
      * 传统的表单提交
@@ -119,6 +124,15 @@ public class UserController {
 
             response.addCookie(loginActCookie);
             response.addCookie(loginPwdCookie);
+//            Jedis jedis = jedisPool.getResource();
+//            jedis.set("loginAct",loginAct);
+//            jedis.set("loginPwd",MD5Util.getMD5(loginPwd));
+//            Jedis resource = jedisPool.getResource();
+//            resource.set("loginAct",loginAct);
+//            resource.set("loginPwd",MD5Util.getMD5(loginPwd));
+//            resource.expire("loginAct",60*60*24*10);
+//            resource.expire("loginPwd",60*60*24*10);
+
         }
 
         return map;

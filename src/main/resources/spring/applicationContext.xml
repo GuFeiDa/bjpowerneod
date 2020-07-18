@@ -79,4 +79,19 @@
         <aop:advisor advice-ref="myAdvice" pointcut-ref="servicePt" />
     </aop:config>
 
+    <!--使用Spring创建第三方对象-->
+    <!--将jedis对象交给Spring容器管理-->
+    <bean id="config" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="10"></property>
+        <property name="maxIdle" value="3"></property>
+        <property name="testOnBorrow" value="true"></property>
+    </bean>
+
+    <!-- new JedisPoll(config,host) -->
+    <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+        <constructor-arg name="poolConfig" ref="config"/>
+        <constructor-arg name="host" value="192.168.184.128"/>
+        <!--<constructor-arg name="password" value="123456" />-->
+    </bean>
+
 </beans>
